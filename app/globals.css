@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background-color: #100c0b;
+  color: #f5f3f0;
+}
+
+* {
+  scrollbar-color: #282723 #100c0b;
+}
