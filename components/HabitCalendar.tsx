@@ -28,7 +28,7 @@ export function HabitCalendar({
       <p className="mb-3 text-xs text-fog">
         Прогресс за 30 дней — нажми на день, чтобы отметить
       </p>
-      <div className="grid grid-cols-6 gap-1.5">
+      <div className="grid grid-cols-[repeat(6,minmax(0,2.75rem))] justify-center gap-2">
         {days.map((day, index) => {
           const done = doneSet.has(day);
           const isToday = day === today;
@@ -43,12 +43,12 @@ export function HabitCalendar({
               title={day}
               aria-label={`День ${index + 1}${done ? ", выполнено" : ""}`}
               aria-pressed={done}
-              className={`flex aspect-square items-center justify-center rounded-md border text-[11px] transition-colors ${
+              className={`flex aspect-square items-center justify-center rounded-md border text-sm font-semibold transition-colors ${
                 isFuture
-                  ? "cursor-not-allowed border-transparent bg-night/50 text-fog/30"
+                  ? "cursor-not-allowed border-transparent bg-night/60 text-fog/45"
                   : done
-                    ? "border-transparent font-semibold text-smoky"
-                    : "border-eerie-light bg-night text-fog hover:border-fog"
+                    ? "border-transparent text-smoky"
+                    : "border-eerie-light bg-night text-cream/70 hover:border-fog hover:text-cream"
               } ${
                 isToday
                   ? "ring-2 ring-cream ring-offset-2 ring-offset-eerie"
