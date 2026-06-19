@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Habit } from "@/lib/types";
 import { loadState, saveState, clearState } from "@/lib/storage";
-import { dateKey } from "@/lib/date";
+import { dateKey, pluralDays } from "@/lib/date";
 import { computeCurrentStreak, computeBestStreak } from "@/lib/streak";
 import { MAX_HABITS } from "@/lib/presets";
 import { AddHabitForm } from "@/components/AddHabitForm";
@@ -30,6 +30,10 @@ export default function Home() {
   const today = dateKey();
   const streak = computeCurrentStreak(habits, today);
   const best = computeBestStreak(habits);
+  const totalMarked = habits.reduce(
+    (sum, habit) => sum + habit.completedDates.length,
+    0,
+  );
 
   function addHabit(data: { name: string; goalDays: number; color: string }) {
     setHabits((prev) => {
@@ -95,6 +99,29 @@ export default function Home() {
           Заведи до 5 привычек и отмечай их каждый день. Данные хранятся только в
           твоём браузере.
         </p>
+
+        {mounted && habits.length > 0 && (
+          <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-eerie-light bg-night/50 px-3 py-1.5 text-sm">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="h-4 w-4 text-moss"
+            >
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            <span className="text-fog">
+              Всего отмечено:{" "}
+              <span className="font-semibold text-cream">{totalMarked}</span>{" "}
+              {pluralDays(totalMarked)}
+            </span>
+          </div>
+        )}
       </header>
 
       <div className="space-y-6">

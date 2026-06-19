@@ -2,17 +2,8 @@
 
 import { useState } from "react";
 import type { Habit } from "@/lib/types";
+import { pluralDays } from "@/lib/date";
 import { HabitCalendar } from "./HabitCalendar";
-
-/** Правильное склонение слова «день» для числа. */
-function pluralDays(n: number): string {
-  const mod100 = n % 100;
-  const mod10 = n % 10;
-  if (mod100 >= 11 && mod100 <= 14) return "дней";
-  if (mod10 === 1) return "день";
-  if (mod10 >= 2 && mod10 <= 4) return "дня";
-  return "дней";
-}
 
 interface HabitCardProps {
   habit: Habit;
