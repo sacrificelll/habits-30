@@ -33,6 +33,7 @@ export function HabitCard({
   const daysDone = habit.completedDates.length;
   const remaining = Math.max(0, habit.goalDays - daysDone);
   const reached = remaining === 0;
+  const percent = Math.min(100, Math.round((daysDone / habit.goalDays) * 100));
   const doneToday = habit.completedDates.includes(today);
 
   return (
@@ -58,12 +59,13 @@ export function HabitCard({
                 : `Цель: ${habit.goalDays} ${pluralDays(habit.goalDays)} · осталось ${remaining} ${pluralDays(remaining)}`}
             </p>
           </div>
-          <span className="flex items-center gap-2">
+          <span className="flex shrink-0 items-center gap-2.5">
             <span
-              aria-hidden="true"
-              className="h-3 w-3 shrink-0 rounded-full"
-              style={{ backgroundColor: habit.color }}
-            />
+              className="text-sm font-bold tabular-nums text-cream"
+              title="Выполнено от цели"
+            >
+              {percent}%
+            </span>
             <span
               aria-hidden="true"
               className={`text-fog transition-transform ${
