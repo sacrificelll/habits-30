@@ -38,3 +38,32 @@ export function computeCurrentStreak(habits: Habit[], today: string): number {
   }
   return streak;
 }
+
+/** true, если `currKey` — это календарный день, следующий сразу за `prevKey`. */
+function isNextDay(prevKey: string, currKey: string): boolean {
+  const [year, month, day] = prevKey.split("-").map(Number);
+  return dateKey(new Date(year, month - 1, day + 1)) === currKey;
+}
+
+/**
+ * Лучший «стрик» за всё время: самая длинная серия календарных дней подряд,
+ * в которые была отмечена хотя бы одна привычка. Та же модель, что и у
+ * текущего стрика, но без грейс-периода — это просто рекорд по истории.
+ */
+export function computeBestStreak(habits: Habit[]): number {
+  const active = new Set<string>();
+  for (const habit of habits) {
+    for (const date of habit.completedDates) active.add(date);
+  }
+  if (active.size === 0) return 0;
+
+  // Ключи YYYY-MM-DD сортируются по строке как по дате.
+  const sorted = [...active].sort();
+  let best = 1;
+  let run = 1;
+  for (let i = 1; i < sorted.length; i++) {
+    run = isNextDay(sorted[i - 1], sorted[i]) ? run + 1 : 1;
+    if (run > best) best = run;
+  }
+  return best;
+}
