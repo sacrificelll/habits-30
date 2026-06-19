@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Habit } from "@/lib/types";
-import { loadState, saveState } from "@/lib/storage";
+import { loadState, saveState, clearState } from "@/lib/storage";
 import { dateKey } from "@/lib/date";
 import { computeCurrentStreak } from "@/lib/streak";
 import { MAX_HABITS } from "@/lib/presets";
@@ -10,6 +10,7 @@ import { AddHabitForm } from "@/components/AddHabitForm";
 import { HabitCard } from "@/components/HabitCard";
 import { EmptyState } from "@/components/EmptyState";
 import { StreakBadge } from "@/components/StreakBadge";
+import { ResetButton } from "@/components/ResetButton";
 
 export default function Home() {
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -50,6 +51,12 @@ export default function Home() {
 
   function deleteHabit(id: string) {
     setHabits((prev) => prev.filter((habit) => habit.id !== id));
+  }
+
+  // Полный сброс: чистим хранилище и состояние.
+  function resetAll() {
+    clearState();
+    setHabits([]);
   }
 
   // Отмечает/снимает выполнение привычки за конкретный день.
@@ -107,6 +114,8 @@ export default function Home() {
             ))
           )}
         </section>
+
+        {mounted && habits.length > 0 && <ResetButton onReset={resetAll} />}
       </div>
     </main>
   );
