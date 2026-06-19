@@ -4,6 +4,16 @@ import { useState } from "react";
 import type { Habit } from "@/lib/types";
 import { HabitCalendar } from "./HabitCalendar";
 
+/** Правильное склонение слова «день» для числа. */
+function pluralDays(n: number): string {
+  const mod100 = n % 100;
+  const mod10 = n % 10;
+  if (mod100 >= 11 && mod100 <= 14) return "дней";
+  if (mod10 === 1) return "день";
+  if (mod10 >= 2 && mod10 <= 4) return "дня";
+  return "дней";
+}
+
 interface HabitCardProps {
   habit: Habit;
   today: string;
@@ -21,6 +31,8 @@ export function HabitCard({
   const [expanded, setExpanded] = useState(false);
 
   const daysDone = habit.completedDates.length;
+  const remaining = Math.max(0, habit.goalDays - daysDone);
+  const reached = remaining === 0;
   const doneToday = habit.completedDates.includes(today);
 
   return (
@@ -41,7 +53,9 @@ export function HabitCard({
           <div>
             <h3 className="font-semibold text-cream">{habit.name}</h3>
             <p className="mt-1 text-xs text-fog">
-              Цель: {habit.goalDays} дней · отмечено {daysDone}
+              {reached
+                ? `Цель: ${habit.goalDays} ${pluralDays(habit.goalDays)} · выполнено 🎉`
+                : `Цель: ${habit.goalDays} ${pluralDays(habit.goalDays)} · осталось ${remaining} ${pluralDays(remaining)}`}
             </p>
           </div>
           <span className="flex items-center gap-2">

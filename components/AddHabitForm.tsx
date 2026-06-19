@@ -19,17 +19,31 @@ export function AddHabitForm({ count, onAdd }: AddHabitFormProps) {
   const [name, setName] = useState("");
   const [goalDays, setGoalDays] = useState(DEFAULT_GOAL);
   const [color, setColor] = useState(HABIT_COLORS[0]);
+  const [confirming, setConfirming] = useState(false);
 
   const limitReached = count >= MAX_HABITS;
-  const canAdd = name.trim().length > 0 && !limitReached;
+  const trimmedName = name.trim();
+  const canAdd = trimmedName.length > 0 && !limitReached;
+
+  // Любое изменение полей выводит из режима подтверждения.
+  function setNameSafe(value: string) {
+    setName(value);
+    setConfirming(false);
+  }
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (!canAdd) return;
-    onAdd({ name: name.trim(), goalDays, color });
+    setConfirming(true); // не добавляем сразу — сначала подтверждение
+  }
+
+  function confirmAdd() {
+    if (!canAdd) return;
+    onAdd({ name: trimmedName, goalDays, color });
     setName("");
     setColor(HABIT_COLORS[0]);
     setGoalDays(DEFAULT_GOAL);
+    setConfirming(false);
   }
 
   return (
@@ -48,7 +62,7 @@ export function AddHabitForm({ count, onAdd }: AddHabitFormProps) {
             <button
               key={preset.label}
               type="button"
-              onClick={() => setName(preset.label)}
+              onClick={() => setNameSafe(preset.label)}
               disabled={limitReached}
               className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 ${
                 active
@@ -74,7 +88,7 @@ export function AddHabitForm({ count, onAdd }: AddHabitFormProps) {
             id="habit-name"
             type="text"
             value={name}
-            onChange={(event) => setName(event.target.value)}
+            onChange={(event) => setNameSafe(event.target.value)}
             disabled={limitReached}
             maxLength={40}
             autoComplete="off"
@@ -100,6 +114,7 @@ export function AddHabitForm({ count, onAdd }: AddHabitFormProps) {
               onChange={(event) => {
                 const value = Number(event.target.value);
                 setGoalDays(Number.isNaN(value) ? DEFAULT_GOAL : value);
+                setConfirming(false);
               }}
               onBlur={() =>
                 setGoalDays((value) =>
@@ -118,7 +133,10 @@ export function AddHabitForm({ count, onAdd }: AddHabitFormProps) {
                 <button
                   key={value}
                   type="button"
-                  onClick={() => setColor(value)}
+                  onClick={() => {
+                    setColor(value);
+                    setConfirming(false);
+                  }}
                   disabled={limitReached}
                   aria-label={`Выбрать цвет ${value}`}
                   className={`h-8 w-8 rounded-full transition-transform hover:scale-110 disabled:opacity-40 ${
@@ -138,6 +156,35 @@ export function AddHabitForm({ count, onAdd }: AddHabitFormProps) {
             Достигнут лимит в {MAX_HABITS} привычек. Удалите одну, чтобы добавить
             новую.
           </p>
+        ) : confirming ? (
+          <div className="space-y-3 rounded-xl border border-hot-orange/40 bg-night p-4">
+            <p className="text-sm text-cream">
+              Добавить привычку{" "}
+              <span className="font-semibold text-hot-orange">
+                «{trimmedName}»
+              </span>
+              ?
+            </p>
+            <p className="text-xs text-fog">
+              ⚠️ Название потом изменить будет нельзя.
+            </p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={confirmAdd}
+                className="rounded-xl bg-hot-orange px-4 py-2 text-sm font-semibold text-cream transition-colors hover:bg-orange-wheel"
+              >
+                Да, добавить
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirming(false)}
+                className="rounded-xl border border-eerie-light px-4 py-2 text-sm text-fog transition-colors hover:text-cream"
+              >
+                Отмена
+              </button>
+            </div>
+          </div>
         ) : (
           <button
             type="submit"
