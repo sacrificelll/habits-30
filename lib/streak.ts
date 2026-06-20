@@ -1,5 +1,11 @@
-import type { Habit } from "./types";
+import type { Habit, StreakState } from "./types";
 import { dateKey } from "./date";
+
+/** Сдвигает дату-ключ на `delta` дней (вперёд/назад). */
+function shiftDay(key: string, delta: number): string {
+  const [year, month, day] = key.split("-").map(Number);
+  return dateKey(new Date(year, month - 1, day + delta));
+}
 
 /**
  * Общий «стрик»: сколько дней подряд (заканчивая сегодня или вчера) была
@@ -66,4 +72,57 @@ export function computeBestStreak(habits: Habit[]): number {
     if (run > best) best = run;
   }
   return best;
+}
+
+/**
+ * Продлевает «живой» стрик сегодняшней отметкой. Вызывается, когда пользователь
+ * отмечает любую привычку за СЕГОДНЯ. Идемпотентно в пределах одного дня:
+ * вторая отметка за тот же день серию не накручивает.
+ */
+export function advanceStreak(streak: StreakState, today: string): StreakState {
+  if (streak.lastDay === today) return streak;
+  const continued = streak.lastDay === shiftDay(today, -1);
+  const current = continued ? streak.current + 1 : 1;
+  return {
+    current,
+    best: Math.max(streak.best, current),
+    lastDay: today,
+  };
+}
+
+/**
+ * Значения для показа. Серия «жива», если последняя отметка была сегодня или
+ * вчера (есть весь сегодняшний день, чтобы продолжить). Если пропущены целые
+ * сутки — текущая серия показывается как 0, рекорд сохраняется.
+ */
+export function streakForDisplay(
+  streak: StreakState,
+  today: string,
+): { current: number; best: number } {
+  const alive =
+    streak.lastDay === today || streak.lastDay === shiftDay(today, -1);
+  return { current: alive ? streak.current : 0, best: streak.best };
+}
+
+/**
+ * Восстанавливает стрик из истории отметок — разово, для старых данных без
+ * сохранённого стрика. Дальше серия живёт уже по «живой» модели.
+ */
+export function deriveStreakFromHistory(
+  habits: Habit[],
+  today: string,
+): StreakState {
+  const active = new Set<string>();
+  for (const habit of habits) {
+    for (const date of habit.completedDates) active.add(date);
+  }
+  let lastDay: string | null = null;
+  if (active.has(today)) lastDay = today;
+  else if (active.has(shiftDay(today, -1))) lastDay = shiftDay(today, -1);
+
+  return {
+    current: computeCurrentStreak(habits, today),
+    best: computeBestStreak(habits),
+    lastDay,
+  };
 }

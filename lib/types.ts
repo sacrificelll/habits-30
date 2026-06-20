@@ -11,6 +11,17 @@ export interface Habit {
   completedDates: string[];
 }
 
+/** «Живой» стрик: продлевается только сегодняшней отметкой, не зависит от правок прошлых дней. */
+export interface StreakState {
+  /** Текущая серия дней подряд. */
+  current: number;
+  /** Лучшая серия за всё время (рекорд, не уменьшается). */
+  best: number;
+  /** Дата последней сегодняшней отметки, продлившей серию (YYYY-MM-DD), или null. */
+  lastDay: string | null;
+}
+
 export interface AppState {
   habits: Habit[];
+  streak: StreakState;
 }

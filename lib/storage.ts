@@ -1,7 +1,12 @@
 import type { AppState } from "./types";
+import { deriveStreakFromHistory } from "./streak";
+import { dateKey } from "./date";
 
 const STORAGE_KEY = "habits-30:v1";
-const EMPTY_STATE: AppState = { habits: [] };
+const EMPTY_STATE: AppState = {
+  habits: [],
+  streak: { current: 0, best: 0, lastDay: null },
+};
 
 /** Читает состояние из localStorage. На сервере и при ошибке возвращает пустое. */
 export function loadState(): AppState {
@@ -11,7 +16,12 @@ export function loadState(): AppState {
     if (!raw) return EMPTY_STATE;
     const parsed = JSON.parse(raw) as Partial<AppState>;
     if (!parsed || !Array.isArray(parsed.habits)) return EMPTY_STATE;
-    return { habits: parsed.habits };
+    // Старые данные без стрика — восстанавливаем его из истории один раз.
+    const streak =
+      parsed.streak && typeof parsed.streak.current === "number"
+        ? parsed.streak
+        : deriveStreakFromHistory(parsed.habits, dateKey());
+    return { habits: parsed.habits, streak };
   } catch {
     return EMPTY_STATE;
   }

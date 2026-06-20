@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Habit } from "@/lib/types";
+import type { Habit, StreakState } from "@/lib/types";
 import { loadState, saveState, clearState } from "@/lib/storage";
 import { dateKey, pluralDays } from "@/lib/date";
-import { computeCurrentStreak, computeBestStreak } from "@/lib/streak";
+import { advanceStreak, streakForDisplay } from "@/lib/streak";
 import { MAX_HABITS } from "@/lib/presets";
 import { AddHabitForm } from "@/components/AddHabitForm";
 import { HabitCard } from "@/components/HabitCard";
@@ -14,22 +14,28 @@ import { ResetButton } from "@/components/ResetButton";
 
 export default function Home() {
   const [habits, setHabits] = useState<Habit[]>([]);
+  const [streak, setStreak] = useState<StreakState>({
+    current: 0,
+    best: 0,
+    lastDay: null,
+  });
   const [mounted, setMounted] = useState(false);
 
   // Загружаем данные из localStorage только на клиенте.
   useEffect(() => {
-    setHabits(loadState().habits);
+    const state = loadState();
+    setHabits(state.habits);
+    setStreak(state.streak);
     setMounted(true);
   }, []);
 
   // Сохраняем при любых изменениях — но только после первой загрузки.
   useEffect(() => {
-    if (mounted) saveState({ habits });
-  }, [habits, mounted]);
+    if (mounted) saveState({ habits, streak });
+  }, [habits, streak, mounted]);
 
   const today = dateKey();
-  const streak = computeCurrentStreak(habits, today);
-  const best = computeBestStreak(habits);
+  const { current, best } = streakForDisplay(streak, today);
   const totalMarked = habits.reduce(
     (sum, habit) => sum + habit.completedDates.length,
     0,
@@ -62,22 +68,32 @@ export default function Home() {
   function resetAll() {
     clearState();
     setHabits([]);
+    setStreak({ current: 0, best: 0, lastDay: null });
   }
 
   // Отмечает/снимает выполнение привычки за конкретный день.
   function toggleDate(id: string, key: string) {
+    const habit = habits.find((item) => item.id === id);
+    const wasDone = habit ? habit.completedDates.includes(key) : false;
+
     setHabits((prev) =>
-      prev.map((habit) => {
-        if (habit.id !== id) return habit;
-        const done = habit.completedDates.includes(key);
+      prev.map((item) => {
+        if (item.id !== id) return item;
+        const done = item.completedDates.includes(key);
         return {
-          ...habit,
+          ...item,
           completedDates: done
-            ? habit.completedDates.filter((date) => date !== key)
-            : [...habit.completedDates, key],
+            ? item.completedDates.filter((date) => date !== key)
+            : [...item.completedDates, key],
         };
       }),
     );
+
+    // Серию продлевает только новая отметка за СЕГОДНЯ. Снятие отметки и
+    // правка прошлых дней на стрик не влияют.
+    if (key === today && !wasDone) {
+      setStreak((prev) => advanceStreak(prev, today));
+    }
   }
 
   return (
@@ -93,7 +109,7 @@ export default function Home() {
               Habits <span className="text-hot-orange">30</span>
             </h1>
           </div>
-          <StreakBadge streak={streak} best={best} />
+          <StreakBadge streak={current} best={best} />
         </div>
         <p className="mt-3 text-sm text-fog">
           Заведи до 5 привычек и отмечай их каждый день. Данные хранятся только в
