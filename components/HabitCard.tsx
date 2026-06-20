@@ -36,12 +36,7 @@ export function HabitCard({
       />
 
       <div className="p-5 pl-7">
-        <button
-          type="button"
-          onClick={() => setExpanded((value) => !value)}
-          aria-expanded={expanded}
-          className="flex w-full items-start justify-between gap-3 text-left"
-        >
+        <div className="flex items-start justify-between gap-3">
           <div>
             <h3 className="font-semibold text-cream">{habit.name}</h3>
             <p className="mt-1 text-xs text-fog">
@@ -50,23 +45,13 @@ export function HabitCard({
                 : `Цель: ${habit.goalDays} ${pluralDays(habit.goalDays)} · осталось ${remaining} ${pluralDays(remaining)}`}
             </p>
           </div>
-          <span className="flex shrink-0 items-center gap-2.5">
-            <span
-              className="text-sm font-bold tabular-nums text-cream"
-              title="Выполнено от цели"
-            >
-              {percent}%
-            </span>
-            <span
-              aria-hidden="true"
-              className={`text-fog transition-transform ${
-                expanded ? "rotate-180" : ""
-              }`}
-            >
-              ⌄
-            </span>
+          <span
+            className="shrink-0 text-sm font-bold tabular-nums text-cream"
+            title="Выполнено от цели"
+          >
+            {percent}%
           </span>
-        </button>
+        </div>
 
         <div className="mt-4 flex items-center gap-2">
           <button
@@ -109,6 +94,21 @@ export function HabitCard({
             </button>
           )}
         </div>
+
+        <button
+          type="button"
+          onClick={() => setExpanded((value) => !value)}
+          aria-expanded={expanded}
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-eerie-light bg-night/40 py-2 text-sm font-medium text-fog transition-colors hover:border-fog hover:text-cream"
+        >
+          <span
+            aria-hidden="true"
+            className={`transition-transform ${expanded ? "rotate-180" : ""}`}
+          >
+            ⌄
+          </span>
+          {expanded ? "Свернуть календарь" : "Отметить прошлые дни"}
+        </button>
 
         {expanded && (
           <HabitCalendar
