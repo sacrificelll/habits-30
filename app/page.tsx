@@ -64,6 +64,29 @@ export default function Home() {
     setHabits((prev) => prev.filter((habit) => habit.id !== id));
   }
 
+  // Меняет цель привычки (дни). На стрик не влияет.
+  function updateGoal(id: string, goalDays: number) {
+    setHabits((prev) =>
+      prev.map((habit) => (habit.id === id ? { ...habit, goalDays } : habit)),
+    );
+  }
+
+  // «Начать заново»: обнуляем отметки привычки и стартуем новые 30 дней с
+  // сегодня. Стрик — отдельный счётчик, поэтому не трогается.
+  function restartHabit(id: string) {
+    setHabits((prev) =>
+      prev.map((habit) =>
+        habit.id === id
+          ? {
+              ...habit,
+              completedDates: [],
+              createdAt: new Date().toISOString(),
+            }
+          : habit,
+      ),
+    );
+  }
+
   // Полный сброс: чистим хранилище и состояние.
   function resetAll() {
     clearState();
@@ -154,6 +177,8 @@ export default function Home() {
                 today={today}
                 onToggleDate={toggleDate}
                 onDelete={deleteHabit}
+                onUpdateGoal={updateGoal}
+                onRestart={restartHabit}
               />
             ))
           )}
