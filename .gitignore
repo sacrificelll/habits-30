@@ -21,6 +21,7 @@ out/
 dist/
 build/
 next-env.d.ts
+*.tsbuildinfo
 
 # Системные
 .DS_Store
