@@ -1,32 +1,33 @@
 "use client";
 
-import { buildDayRange, dateKey } from "@/lib/date";
+import { buildDayRange, dateKey, pluralDays } from "@/lib/date";
 
 interface HabitCalendarProps {
   color: string;
   createdAt: string;
+  goalDays: number;
   completedDates: string[];
   today: string;
   onToggleDate: (date: string) => void;
 }
 
-const TOTAL_DAYS = 30;
-
 export function HabitCalendar({
   color,
   createdAt,
+  goalDays,
   completedDates,
   today,
   onToggleDate,
 }: HabitCalendarProps) {
   const startKey = dateKey(new Date(createdAt));
-  const days = buildDayRange(startKey, TOTAL_DAYS);
+  const days = buildDayRange(startKey, goalDays);
   const doneSet = new Set(completedDates);
 
   return (
     <div className="mt-4 border-t border-eerie-light pt-4">
       <p className="mb-3 text-xs text-fog">
-        Прогресс за 30 дней — нажми на день, чтобы отметить
+        Прогресс за {goalDays} {pluralDays(goalDays)} — нажми на день, чтобы
+        отметить
       </p>
       <div className="grid grid-cols-[repeat(6,minmax(0,2.75rem))] justify-center gap-2">
         {days.map((day, index) => {

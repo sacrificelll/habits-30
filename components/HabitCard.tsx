@@ -190,6 +190,7 @@ export function HabitCard({
             <HabitCalendar
               color={habit.color}
               createdAt={habit.createdAt}
+              goalDays={habit.goalDays}
               completedDates={habit.completedDates}
               today={today}
               onToggleDate={(date) => onToggleDate(habit.id, date)}
