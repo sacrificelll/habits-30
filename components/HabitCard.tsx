@@ -6,6 +6,16 @@ import { pluralDays } from "@/lib/date";
 import { MIN_GOAL, MAX_GOAL } from "@/lib/presets";
 import { HabitCalendar } from "./HabitCalendar";
 
+/** #RRGGBB → rgba(...) — для лёгкой подсветки кнопок под цвет привычки. */
+function hexToRgba(hex: string, alpha: number): string {
+  const value = hex.replace("#", "");
+  if (value.length !== 6) return "transparent";
+  const r = parseInt(value.slice(0, 2), 16);
+  const g = parseInt(value.slice(2, 4), 16);
+  const b = parseInt(value.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 interface HabitCardProps {
   habit: Habit;
   today: string;
@@ -34,6 +44,13 @@ export function HabitCard({
   const reached = remaining === 0;
   const percent = Math.min(100, Math.round((daysDone / habit.goalDays) * 100));
   const doneToday = habit.completedDates.includes(today);
+
+  // Кнопки управления — в цвет выбранной привычки (рамка + лёгкая подсветка).
+  const chipStyle = {
+    borderColor: habit.color,
+    color: habit.color,
+    backgroundColor: hexToRgba(habit.color, 0.12),
+  };
 
   function saveGoal() {
     const value = Math.min(MAX_GOAL, Math.max(MIN_GOAL, Math.round(goalDraft)));
@@ -222,14 +239,16 @@ export function HabitCard({
                       setGoalDraft(habit.goalDays);
                       setEditingGoal(true);
                     }}
-                    className="rounded-lg border border-eerie-light px-3 py-1.5 text-xs font-medium text-fog transition-colors hover:border-fog hover:text-cream"
+                    style={chipStyle}
+                    className="rounded-lg border px-3 py-1.5 text-xs font-medium transition hover:brightness-125"
                   >
                     Изменить цель
                   </button>
                   <button
                     type="button"
                     onClick={() => setRestartConfirming(true)}
-                    className="rounded-lg border border-eerie-light px-3 py-1.5 text-xs font-medium text-fog transition-colors hover:border-hot-orange hover:text-hot-orange"
+                    style={chipStyle}
+                    className="rounded-lg border px-3 py-1.5 text-xs font-medium transition hover:brightness-125"
                   >
                     Начать заново
                   </button>
