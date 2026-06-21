@@ -134,10 +134,36 @@ export default function Home() {
           </div>
           <StreakBadge streak={current} best={best} />
         </div>
-        <p className="mt-3 text-sm text-fog">
-          Заведи до 5 привычек и отмечай их каждый день. Данные хранятся только в
-          твоём браузере.
-        </p>
+        <div className="mt-3 rounded-xl border border-eerie-light bg-night/40 p-4">
+          <p className="text-sm text-fog">
+            Заведи до 5 привычек и отмечай их каждый день.
+          </p>
+          <div className="mt-3 flex items-start gap-2.5 rounded-lg border border-orange-wheel/40 bg-orange-wheel/10 px-3 py-2.5">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="mt-0.5 h-4 w-4 shrink-0 text-orange-wheel"
+            >
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            <p className="text-sm leading-snug">
+              <span className="font-semibold text-orange-wheel">
+                Данные хранятся только в твоём браузере
+              </span>
+              <span className="text-cream/90">
+                {" "}
+                — на этом устройстве и нигде больше. Очистка истории или кэша
+                браузера удалит прогресс.
+              </span>
+            </p>
+          </div>
+        </div>
 
         {mounted && habits.length > 0 && (
           <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-eerie-light bg-night/50 px-3 py-1.5 text-sm">
