@@ -4,7 +4,6 @@
 
 🔗 **Репозиторий (GitHub):** https://github.com/sacrificelll/habits-30
 🔗 **Демо (Vercel):** https://habits-30.vercel.app
-📹 **Видео-разбор:** _ссылка появится к сдаче_
 
 > Тестовое задание для OPERIX. Стек: Next.js + TypeScript + Tailwind CSS.
 

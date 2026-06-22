@@ -15,7 +15,7 @@ function shiftDay(key: string, delta: number): string {
  * стрик жив (у пользователя есть весь день, чтобы продолжить). Если пропущены
  * и сегодня, и вчера — стрик равен 0.
  */
-export function computeCurrentStreak(habits: Habit[], today: string): number {
+function computeCurrentStreak(habits: Habit[], today: string): number {
   const active = new Set<string>();
   for (const habit of habits) {
     for (const date of habit.completedDates) active.add(date);
@@ -56,7 +56,7 @@ function isNextDay(prevKey: string, currKey: string): boolean {
  * в которые была отмечена хотя бы одна привычка. Та же модель, что и у
  * текущего стрика, но без грейс-периода — это просто рекорд по истории.
  */
-export function computeBestStreak(habits: Habit[]): number {
+function computeBestStreak(habits: Habit[]): number {
   const active = new Set<string>();
   for (const habit of habits) {
     for (const date of habit.completedDates) active.add(date);
