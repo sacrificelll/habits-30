@@ -36,7 +36,7 @@ export function HabitCard({
   const [confirming, setConfirming] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [editingGoal, setEditingGoal] = useState(false);
-  const [goalDraft, setGoalDraft] = useState(habit.goalDays);
+  const [goalDraft, setGoalDraft] = useState(String(habit.goalDays));
   const [restartConfirming, setRestartConfirming] = useState(false);
 
   const daysDone = habit.completedDates.length;
@@ -53,7 +53,11 @@ export function HabitCard({
   };
 
   function saveGoal() {
-    const value = Math.min(MAX_GOAL, Math.max(MIN_GOAL, Math.round(goalDraft)));
+    const parsed = parseInt(goalDraft, 10);
+    // Пусто или мусор — оставляем прежнюю цель; иначе ограничиваем 7–30.
+    const value = Number.isFinite(parsed)
+      ? Math.min(MAX_GOAL, Math.max(MIN_GOAL, parsed))
+      : habit.goalDays;
     onUpdateGoal(habit.id, value);
     setEditingGoal(false);
   }
@@ -208,10 +212,11 @@ export function HabitCard({
                   <input
                     id={`goal-${habit.id}`}
                     type="number"
+                    inputMode="numeric"
                     min={MIN_GOAL}
                     max={MAX_GOAL}
                     value={goalDraft}
-                    onChange={(event) => setGoalDraft(Number(event.target.value))}
+                    onChange={(event) => setGoalDraft(event.target.value)}
                     className="w-20 rounded-lg border border-eerie-light bg-night px-3 py-1.5 text-sm text-cream outline-none transition-colors focus:border-hot-orange"
                   />
                   <button
@@ -225,7 +230,7 @@ export function HabitCard({
                     type="button"
                     onClick={() => {
                       setEditingGoal(false);
-                      setGoalDraft(habit.goalDays);
+                      setGoalDraft(String(habit.goalDays));
                     }}
                     className="rounded-lg border border-eerie-light px-3 py-1.5 text-sm text-fog transition-colors hover:text-cream"
                   >
@@ -237,7 +242,7 @@ export function HabitCard({
                   <button
                     type="button"
                     onClick={() => {
-                      setGoalDraft(habit.goalDays);
+                      setGoalDraft(String(habit.goalDays));
                       setEditingGoal(true);
                     }}
                     style={chipStyle}

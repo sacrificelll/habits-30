@@ -17,7 +17,7 @@ interface AddHabitFormProps {
 
 export function AddHabitForm({ count, onAdd }: AddHabitFormProps) {
   const [name, setName] = useState("");
-  const [goalDays, setGoalDays] = useState(DEFAULT_GOAL);
+  const [goalInput, setGoalInput] = useState(String(DEFAULT_GOAL));
   const [color, setColor] = useState(HABIT_COLORS[0]);
   const [confirming, setConfirming] = useState(false);
 
@@ -39,10 +39,14 @@ export function AddHabitForm({ count, onAdd }: AddHabitFormProps) {
 
   function confirmAdd() {
     if (!canAdd) return;
+    const parsed = parseInt(goalInput, 10);
+    const goalDays = Number.isFinite(parsed)
+      ? Math.min(MAX_GOAL, Math.max(MIN_GOAL, parsed))
+      : DEFAULT_GOAL;
     onAdd({ name: trimmedName, goalDays, color });
     setName("");
     setColor(HABIT_COLORS[0]);
-    setGoalDays(DEFAULT_GOAL);
+    setGoalInput(String(DEFAULT_GOAL));
     setConfirming(false);
   }
 
@@ -108,19 +112,21 @@ export function AddHabitForm({ count, onAdd }: AddHabitFormProps) {
             <input
               id="habit-goal"
               type="number"
+              inputMode="numeric"
               min={MIN_GOAL}
               max={MAX_GOAL}
-              value={goalDays}
+              value={goalInput}
               onChange={(event) => {
-                const value = Number(event.target.value);
-                setGoalDays(Number.isNaN(value) ? DEFAULT_GOAL : value);
+                setGoalInput(event.target.value);
                 setConfirming(false);
               }}
-              onBlur={() =>
-                setGoalDays((value) =>
-                  Math.min(MAX_GOAL, Math.max(MIN_GOAL, value)),
-                )
-              }
+              onBlur={() => {
+                const parsed = parseInt(goalInput, 10);
+                const clamped = Number.isFinite(parsed)
+                  ? Math.min(MAX_GOAL, Math.max(MIN_GOAL, parsed))
+                  : DEFAULT_GOAL;
+                setGoalInput(String(clamped));
+              }}
               disabled={limitReached}
               className="w-full rounded-xl border border-eerie-light bg-night px-4 py-2.5 text-cream outline-none transition-colors focus:border-hot-orange disabled:opacity-40"
             />
